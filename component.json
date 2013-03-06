@@ -1,0 +1,16 @@
+{
+	"name":"login",
+	"description":"Login client",
+	"version":"0.1.0",
+	"repo":"kaerus-component/login",
+	"dependencies":{
+		"kaerus-component/hawk":"*",
+		"kaerus-component/ajax":"*",
+		"kaerus-component/script":"*"
+	},
+	"scripts":[
+		"index.js",
+		"template.js"
+	],
+	"styles":["login.css"]
+}
