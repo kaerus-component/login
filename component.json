@@ -11,6 +11,5 @@
 	"scripts":[
 		"index.js",
 		"template.js"
-	],
-	"styles":["login.css"]
+	]
 }
