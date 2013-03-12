@@ -36,6 +36,7 @@ function setText(elem,text){
 
 // send authentication request
 function requestToken(user,pass){
+	var auth;
 
 	if(!user || !pass) {
 		status.text("Enter credentials");
@@ -53,13 +54,13 @@ function requestToken(user,pass){
 	/* dont transmit password in the clear */
 	pass = Hawk.crypto.calculateHash(pass,"SHA256");
 	/* base64 url encode username=password */
-	user = Hawk.crypto.base64urlEncode(user);
-	pass = Hawk.crypto.base64urlEncode(pass);
+	auth = Hawk.crypto.base64urlEncode(user+':'+pass);
 
-	Ajax.get("Authenticate?"+user+"="+pass,{timeout:5000}).then(function(res){
+	Ajax.get("Authenticate?"+auth,{timeout:5000}).then(function(res){
 		status.text("Ok");
 		console.log("received token", res.message);
 	},function(error){
+		error = typeof error === 'object' ? error.message : error;
 		status.text("Error: " + error);
 		submit.removeAttribute('disabled');
 	});
