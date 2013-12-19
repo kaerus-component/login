@@ -5,7 +5,8 @@
 	"repo":"kaerus-component/login",
 	"dependencies":{
 		"kaerus-component/base64":"*",
-		"kaerus-component/ajax":"*"
+		"kaerus-component/ajax":"*",
+		"kaerus-component/elem":"*"
 	},
 	"scripts":[
 		"index.js",

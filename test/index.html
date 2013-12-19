@@ -5,10 +5,13 @@
 		<link rel="stylesheet" href="./login.css" />
 	</head>
 <body>
-<div id="login"></div>
+<div id="login-container"></div>
 <script src="../build/build.js"></script>
 <script>
-require('login');
+	var Login = require('login');
+
+	var login = new Login('login-container');
+
 </script>
 </body>
 </html>

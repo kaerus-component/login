@@ -1,67 +1,69 @@
-var Ajax = require('ajax'),
-    Hawk = require('hawk'),
-    template = require('./template'),
-    elm = document.getElementById('login');
+var $ = require('elem'),
+	Ajax = require('ajax'),
+	base64 = require('base64'),
+    template = require('./template');
 
-elm.innerHTML = template;
 
-var submit = document.getElementById('submit'),
-    status = document.getElementById('status'),
-    user = document.getElementById('username'),
-    pass = document.getElementById('password');
+function Login(container,server){
+	var self = this;
 
-status.text = function(text,append) {
-	setText(this,text,append);
-}
+	if(!container) container = 'login';
 
-// form submit handler
-document.forms[0].onsubmit = function(e){
-	e.preventDefault();
+	if(typeof container === 'string')
+		container = document.getElementById(container);
 
-	submit.setAttribute('disabled',true);
+	if(!container) throw new Error("Login container invalid or missing");
+
+	container.innerHTML = template;
+
+	this.server = server || '';
+	this.elem = $(container);
+	this.submit = $('#submit',this.elem);
+	this.status = $('#status',this.elem);
+	this.user = $('#username',this.elem);
+	this.pass = $('#password',this.elem);
+
+	$("form", this.elem).on('submit',function(e){
+		var method = this.method ? this.method.toLowerCase() : 'get',
+			action = this.action.substr(this.action.lastIndexOf('/'),this.action.length);
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		this.submit.setAttribute('disabled',true);
 	
-	requestToken(user.value,pass.value);
+		self.requestToken(method,action,this.username.value,this.password.value);
 
-	return false;
-}
-
-function setText(elem,text){
-	
-	while (elem.firstChild) {
-        elem.removeChild(elem.firstChild);
-    }
-
-    elem.appendChild(document.createTextNode(text));
+		return false;
+	});
 }
 
 // send authentication request
-function requestToken(user,pass){
-	var auth;
+Login.prototype.requestToken = function(method,action,user,pass){
+	var auth, self;
 
 	if(!user || !pass) {
-		status.text("Enter credentials");
-		submit.removeAttribute('disabled');
+		this.status.text("Enter credentials");
+		this.submit.attr('disabled',null);
 		return;
 	}
 
-	if(!Hawk) {
-		status.text("Client not loaded");
-		return;
-	}
 
-	status.text("Authenticating");
-
-	/* dont transmit password in the clear */
-	pass = Hawk.crypto.calculateHash(pass,"SHA256");
 	/* base64 url encode username=password */
-	auth = Hawk.crypto.base64urlEncode(user+':'+pass);
+	auth = base64.encodeURL(user+':'+pass);
 
-	Ajax.get("Authenticate?"+auth,{timeout:5000}).then(function(res){
-		status.text("Ok");
+	this.status.text("Authenticating");
+
+	Ajax[method](this.server+action+"?"+auth,{timeout:3000}).when(function(res){
+		self.status.text("Ok");
 		console.log("received token", res.message);
 	},function(error){
 		error = typeof error === 'object' ? error.message : error;
-		status.text("Error: " + error);
-		submit.removeAttribute('disabled');
+		self.status.text("Error: " + error);
+		self.submit.attr('disabled',null);
 	});
+
 }
+
+module.exports = Login;
+
